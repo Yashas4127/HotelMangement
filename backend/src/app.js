@@ -10,16 +10,18 @@ import adminRoutes from './routes/admin.js';
 import assistantRoutes from './routes/assistant.js';
 import SiteSettings from './models/SiteSettings.js';
 import { resolveAiProvider } from './utils/aiSettings.js';
+import { isProductionEnvironment } from './config/environment.js';
 import dns from 'node:dns';
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const app = express();
 const allowedOrigins = [
   'https://hotel-mangement-7l3e.vercel.app',
+  'https://karnatakastays.vercel.app',
   ...(process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',').map((origin) => origin.trim()),
 ];
 
 app.disable('x-powered-by');
-if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+if (isProductionEnvironment) app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({
   credentials: true,

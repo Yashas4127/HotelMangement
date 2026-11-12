@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { rateLimit } from 'express-rate-limit';
 import User from '../models/User.js';
+import { isProductionEnvironment } from '../config/environment.js';
 import { requireUser } from '../middleware/auth.js';
 
 const router = Router();
@@ -16,8 +17,8 @@ const authLimit = rateLimit({
 const safeUser = (user) => ({ id: user.id, name: user.name, email: user.email, phone: user.phone || '', role: user.role });
 const sessionCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  secure: isProductionEnvironment,
+  sameSite: isProductionEnvironment ? 'none' : 'lax',
   path: '/',
 };
 
