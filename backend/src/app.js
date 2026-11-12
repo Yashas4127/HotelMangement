@@ -33,6 +33,11 @@ app.use((req, _res, next) => {
   next();
 });
 
+app.get('/', (_req, res) => res.json({
+  name: 'Karnataka Stays API',
+  status: 'ok',
+  health: '/api/health',
+}));
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/api/config', async (_req, res) => {
   const settings = await SiteSettings.findOne({ key: 'site' }).lean();

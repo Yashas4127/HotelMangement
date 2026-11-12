@@ -14,14 +14,17 @@ const authLimit = rateLimit({
   message: { message: 'Too many sign-in attempts. Please try again later.' },
 });
 const safeUser = (user) => ({ id: user.id, name: user.name, email: user.email, phone: user.phone || '', role: user.role });
+const sessionCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  path: '/',
+};
 
 function setSession(res, user) {
   const token = jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
   res.cookie('ks_session', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
+    ...sessionCookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }
@@ -55,7 +58,7 @@ router.post('/login', authLimit, async (req, res) => {
 });
 
 router.post('/logout', (_req, res) => {
-  res.clearCookie('ks_session', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+  res.clearCookie('ks_session', sessionCookieOptions);
   res.status(204).end();
 });
 
