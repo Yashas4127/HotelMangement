@@ -1,0 +1,20 @@
+// Destination groupings are derived from each property's locality / district text in the dataset.
+// Descriptions are brief general-knowledge intros, not claims about any property. Editable in /admin/destinations.
+export const seedDestinations = [
+  { id: 'd-kabini', slug: 'kabini', name: 'Kabini', district: 'Mysuru / Chamarajanagar', keywords: ['kabini'], cover: '', description: 'Backwater lodges on the edge of Nagarahole, built around river views and wildlife safaris.' },
+  { id: 'd-dandeli', slug: 'dandeli', name: 'Dandeli', district: 'Uttara Kannada', keywords: ['dandeli', 'ganeshgudi'], cover: '', description: 'Forest and river country on the Kali, known for rafting, birdlife and jungle camps.' },
+  { id: 'd-bandipur', slug: 'bandipur', name: 'Bandipur', district: 'Chamarajanagar', keywords: ['bandipur'], cover: '', description: 'Dry-deciduous forest around Bandipur National Park, a base for safaris and nature stays.' },
+  { id: 'd-gokarna', slug: 'gokarna', name: 'Gokarna', district: 'Uttara Kannada', keywords: ['gokarna'], cover: '', description: 'A temple town with quiet beaches and cliff-top stays on the Arabian Sea.' },
+  { id: 'd-hampi', slug: 'hampi', name: 'Hampi', district: 'Vijayanagara / Koppal', keywords: ['hampi', 'hosapete', 'anegundi', 'vijayanagara', 'koppal'], cover: '', description: 'Boulder-strewn ruins of the Vijayanagara empire, a UNESCO World Heritage Site.' },
+  { id: 'd-nandi', slug: 'nandi-hills', name: 'Nandi Hills', district: 'Chikkaballapur', keywords: ['nandi', 'chikkaballapur'], cover: '', description: 'Hill-country weekend escapes within reach of Bengaluru.' },
+  { id: 'd-sakleshpur', slug: 'sakleshpur', name: 'Sakleshpur', district: 'Hassan', keywords: ['sakleshpur', 'sakleshpura', 'hassan'], cover: '', description: 'Misty Western Ghats coffee and spice country with plantation stays.' },
+  { id: 'd-chikmagalur', slug: 'chikmagalur', name: 'Chikmagalur', district: 'Chikkamagaluru', keywords: ['chikkamagaluru', 'chikmagalur', 'mudigere', 'kottigehara', 'allampura', 'athigundi'], cover: '', description: 'The coffee capital of Karnataka, with estate bungalows and mountain trails.' },
+  { id: 'd-coorg', slug: 'coorg', name: 'Coorg', district: 'Kodagu', keywords: ['kodagu', 'coorg', 'madikeri', 'virajpet', 'kushalnagar', 'suntikoppa', 'siddapura', 'pollibetta', 'gonikoppa', 'mekur'], cover: '', description: 'Rolling coffee estates, rain-fed forests and family-run homestays in the Western Ghats.' },
+  { id: 'd-mysuru', slug: 'mysuru', name: 'Mysuru', district: 'Mysuru', keywords: ['mysuru', 'mysore'], cover: '', description: 'The city of palaces, with heritage hotels and boutique stays close to the old town.' },
+  { id: 'd-udupi', slug: 'udupi', name: 'Udupi', district: 'Udupi', keywords: ['udupi', 'malpe', 'trasi', 'brahmavara', 'thonse'], cover: '', description: 'Coastal Karnataka: beaches, temple town food and sea-facing resorts.' },
+  { id: 'd-mangaluru', slug: 'mangaluru', name: 'Mangaluru', district: 'Dakshina Kannada', keywords: ['mangaluru', 'dakshina kannada'], cover: '', description: 'A port city on the coast with business hotels and access to the beaches.' },
+  { id: 'd-bengaluru', slug: 'bengaluru', name: 'Bengaluru & Around', district: 'Bengaluru Urban / Rural, Ramanagara', keywords: ['bengaluru', 'devanahalli', 'hoskote', 'kanakapura', 'kaggalipura', 'ramanagara', 'gantiganahalli', 'harisandra'], cover: '', description: 'City boutique stays and resorts on the outskirts for short getaways.' },
+  { id: 'd-hubballi', slug: 'hubballi-dharwad', name: 'Hubballi–Dharwad', district: 'Dharwad', keywords: ['hubballi', 'dharwad'], cover: '', description: 'North Karnataka\'s twin-city hub with hotels for business and transit.' },
+  { id: 'd-belagavi', slug: 'belagavi', name: 'Belagavi', district: 'Belagavi', keywords: ['belagavi'], cover: '', description: 'A cantonment city on the Maharashtra border with city hotels.' },
+  { id: 'd-shivamogga', slug: 'shivamogga', name: 'Shivamogga', district: 'Shivamogga', keywords: ['shivamogga'], cover: '', description: 'Gateway to the Malnad region and its waterfalls.' },
+];
