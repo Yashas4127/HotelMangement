@@ -1,11 +1,13 @@
 import { lazy, Suspense } from 'react';
-import { Route, Routes, Link } from 'react-router-dom';
+import { Route, Routes, Link, useLocation } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout.jsx';
 import RequireCustomer from '../components/forms/RequireCustomer.jsx';
 import Home from '../features/home/Home.jsx';
 import { Empty } from '../components/common/Bits.jsx';
 import AuthPage from '../features/auth/AuthPage.jsx';
 import { BookingPage, EnquiryPage, MyBookings } from '../features/hotels/HotelActions.jsx';
+import SupportWidget from '../components/support/SupportWidget.jsx';
+import { SITE } from '../config/site.js';
 
 const Explore = lazy(() => import('../features/hotels/Explore.jsx'));
 const HotelDetail = lazy(() => import('../features/hotels/HotelDetail.jsx'));
@@ -28,6 +30,9 @@ const AdminBookings = lazy(() => import('../features/admin/AdminBookings.jsx'));
 const NotFound = () => <div className="wrap py-20"><Empty title="Page not found"><Link to="/" className="btn-dark">Back home</Link></Empty></div>;
 
 export default function AppRoutes() {
+  const { pathname } = useLocation();
+  const showSupportWidget = !pathname.startsWith('/admin') || SITE.adminSupportWidgetVisible;
+
   return (
     <Suspense fallback={<div className="grid min-h-[50vh] place-items-center text-sm text-mute">Loading…</div>}>
       <Routes>
@@ -61,6 +66,7 @@ export default function AppRoutes() {
           <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>
+      {showSupportWidget && <SupportWidget />}
     </Suspense>
   );
 }

@@ -1,132 +1,163 @@
 # Karnataka Stays
 
-A MERN application for browsing photo-backed hotels in Karnataka, sending enquiries, and requesting bookings that the Karnataka Stays team coordinates. React/Vite is the client; Express, Node.js, and MongoDB/Mongoose provide the API, accounts, and persistent admin data.
+Karnataka Stays is a hotel discovery and trip-planning website focused on Karnataka, India. Visitors can explore destinations and stays, save properties, ask the travel assistant for itinerary ideas, and send booking or enquiry requests. Administrators manage listings, bookings, WhatsApp support, and AI provider settings from the dashboard.
 
-## Project structure
+## Project overview
+
+- **Frontend:** React, Vite, Tailwind CSS, and React Router.
+- **Backend:** Node.js, Express, and Mongoose.
+- **Database:** MongoDB stores accounts, hotels, destinations, enquiries, bookings, and site settings.
+- **Payments:** Optional Razorpay checkout, enabled when server credentials are configured.
+- **AI assistant:** Gemini, Mistral, or OpenRouter can be configured from **Admin → Settings**. One provider key is enough. Keys are encrypted in MongoDB using `JWT_SECRET`.
+
+### Main folders
 
 ```text
 frontend/
-  src/                 React pages, components, data, and API client
-  scripts/             Photo and contact-data import tools
-  package.json         Vite and browser dependencies
+  src/                 React app, pages, components, and destination data
+  scripts/             Image and contact research utilities
+  package.json         Frontend scripts and dependencies
 backend/
   src/
-    config/            MongoDB connection
-    middleware/        Authentication and role checks
-    models/            Mongoose models
-    routes/            REST API routes
-  test/                Backend unit tests
-  .env.example         Backend environment-variable template
-  package.json         Express, MongoDB, and Razorpay dependencies
-package.json           npm workspace commands for both apps
+    config/            Database connection
+    middleware/        Authentication and authorization
+    models/             MongoDB models
+    routes/             API endpoints
+    utils/              AI settings and travel assistant helpers
+  test/                 Backend tests
+  .env.example          Local backend configuration template
+  package.json          Backend scripts and dependencies
 ```
 
-The root `package.json` uses npm workspaces: install once at the project root, then use the root scripts below. Frontend and backend can also be installed/run separately from their own directories if needed.
+The frontend and backend are separate npm projects; run npm commands from their respective folders.
 
-## Booking and payment flow
+## Hotel photo sourcing
 
-1. Anyone can browse hotels, photos, and destinations without signing in.
-2. A guest creates an account or signs in only when sending an enquiry or requesting a booking.
-3. A booking starts as **Requested**. The admin checks availability and the final price with the property, then sends a quote from **Admin → Bookings**.
-4. The guest signs in and pays the approved quote using Razorpay Checkout.
-5. After payment, the team confirms the reservation with the hotel and marks it **Confirmed** in Admin.
+Finding original photographs for every hotel was difficult. Most of the photos collected were found on official hotel or property websites, but some properties do not have a confirmed original photo source and some images may come from non-official listings. Photo ownership and reuse permission have **not** been confirmed for every image.
 
-The supplied hotel data does not contain dependable live inventory or prices. A booking request is not an availability guarantee. Payment is not taken until an admin has checked the stay and issued a quote. Paid reservations must be confirmed with the hotel; refunds are handled by the booking team and are not automated in this version.
+The images are remote URLs and may change or stop working. Before using the site publicly or commercially, check that each image depicts the correct property, verify its source, and obtain written permission or a suitable licence. Replace images when the source or usage rights cannot be confirmed. The research dataset intentionally does not use AI-generated hotel photos.
 
 ## Requirements
 
-- Node.js 20 or newer and npm
-- MongoDB 7 or newer, running locally or hosted (for example, MongoDB Atlas)
-- A Razorpay account for online payments (test keys for development; live keys for production)
+- Node.js 20.19 or newer, or 22.12 or newer, and npm.
+- MongoDB running locally or a MongoDB Atlas database.
+- A modern browser.
+- Optional: Razorpay credentials for online payments.
+- Optional: an API key from Gemini, Mistral, or OpenRouter for AI responses.
 
-## Install and configure
+## Run locally
 
-From the project directory:
+### 1. Configure the backend
+
+Open PowerShell in the project folder:
 
 ```powershell
+Set-Location .\backend
 npm install
-Copy-Item backend\.env.example backend\.env
+Copy-Item .env.example .env
 ```
 
-Edit `backend\.env` and set:
+Edit `backend\.env`. At minimum, set a MongoDB connection string, a secure `JWT_SECRET`, and admin login details:
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `NODE_ENV` | Yes | Use `development` locally and `production` on the deployed API. |
-| `PORT` | No | API port; defaults to `5000`. |
-| `CLIENT_ORIGIN` | Yes | Exact frontend origin, such as `http://localhost:5173`. Multiple origins may be comma-separated. |
-| `MONGODB_URI` | Yes | MongoDB connection string. Local default: `mongodb://127.0.0.1:27017/karnataka_stays`. |
-| `JWT_SECRET` | Yes | Private random secret of at least 32 characters. Keep it secret and use a different value in production. |
-| `ADMIN_NAME` | Yes for seeding | Display name of the initial administrator. |
-| `ADMIN_EMAIL` | Yes for seeding | Email address used to sign into `/admin/login`. |
-| `ADMIN_PASSWORD` | Yes for seeding | Initial admin password; must be at least 10 characters. Use a unique password. |
-| `RAZORPAY_KEY_ID` | For online payments | Razorpay test or live public key ID. The API returns this to the checkout page. |
-| `RAZORPAY_KEY_SECRET` | For online payments | Private Razorpay API secret. Never put this in frontend code or expose it to guests. |
-| `RAZORPAY_WEBHOOK_SECRET` | Recommended for payments | Secret configured for the Razorpay webhook endpoint. |
+```dotenv
+NODE_ENV=development
+PORT=5000
+CLIENT_ORIGIN=http://localhost:5173
+MONGODB_URI=mongodb://127.0.0.1:27017/karnataka_stays
+JWT_SECRET=replace-with-a-random-secret-at-least-32-characters-long
+ADMIN_NAME=Karnataka Stays Admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace-with-a-unique-password-of-at-least-10-characters
+```
 
-Generate a secret locally in PowerShell:
+You can generate a random secret in PowerShell:
 
 ```powershell
 node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
 ```
 
-Start MongoDB before starting the API. For MongoDB Atlas, create a database user, allow the API host in the network access list, and put the connection URI in `MONGODB_URI`.
+Keep `.env` private and never commit real passwords, API keys, or payment secrets. Keep `JWT_SECRET` stable after saving AI keys in the Admin dashboard; changing it makes previously stored AI keys unreadable.
 
-## Seed the database and run locally
+### 2. Start MongoDB and seed the database
 
-The catalogue includes 54 source properties with photo URLs. Seed imports those hotels and the destination data, and creates or updates the admin account from the environment variables:
+Start your local MongoDB service, or use an Atlas connection string in `MONGODB_URI`. Then, in a terminal opened in `backend`:
 
 ```powershell
 npm run seed
 ```
 
-The source catalogue includes 54 photo-backed properties and the currently collected details. To refresh contact details from the listed hotel websites, optionally run `npm run enrich` and inspect `frontend/src/data/scrapedContacts.json` before seeding; the refresh can take several minutes, and some properties use group reservations contacts. Only data found on the listed property sites is added; unavailable phone numbers are left blank rather than invented.
+The seed command imports the included hotel and destination data and creates or resets the admin account using `ADMIN_EMAIL` and `ADMIN_PASSWORD`. It upserts the imported hotel and destination records, so running it again can overwrite edits to those seeded records. Use it for initial setup or when you intentionally want to refresh the bundled data.
 
-Run the API and frontend in separate terminals:
+### 3. Start the API
 
-```powershell
-# Terminal 1
-npm run server:dev
-```
+In the same `backend` folder:
 
 ```powershell
-# Terminal 2
 npm run dev
 ```
 
-Open the Vite URL shown in the terminal (normally `http://localhost:5173`). The API is available at `http://localhost:5000/api`; Vite proxies `/api` requests to it. Admin login is at `/admin/login`.
+The API runs at `http://localhost:5000`. Check that it is responding at `http://localhost:5000/api/health`.
 
-After changing `ADMIN_EMAIL` or `ADMIN_PASSWORD`, run `npm run seed` again to update the initial admin account. The seed command upserts source hotels and destinations; it does not erase customer accounts, bookings, enquiries, or admin-edited hotels.
+### 4. Start the frontend
 
-## Razorpay setup
+Open a second terminal in the project folder:
 
-1. Use Razorpay test credentials in `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` while developing.
-2. Set `RAZORPAY_WEBHOOK_SECRET` in `backend\.env`.
-3. In the Razorpay dashboard, add a webhook pointing to `https://YOUR_DOMAIN/api/webhooks/razorpay` and subscribe to `payment.captured` and `order.paid`.
-4. Restart the API after changing environment variables.
-5. Test the complete flow with Razorpay test mode before enabling live keys.
+```powershell
+Set-Location .\frontend
+npm install
+npm run dev
+```
 
-If Razorpay keys are not set, guests can still request bookings and admins can send quotes, but payment attempts show an explicit configuration error. Never use live credentials in local development or commit secrets.
+Open the Vite URL shown in the terminal, usually `http://localhost:5173`. Vite proxies `/api` requests to the local backend on port `5000`.
 
-## Features
+Sign in to the admin area at `http://localhost:5173/admin/login` using the email and password set in `backend\.env`.
 
-- Photo-backed public catalogue; hotels without image URLs are excluded from the public listing and booking endpoints.
-- Optional customer account with email and optional phone; login is required for enquiries and booking requests, not for browsing. The admin can use the provided guest contact details to follow up.
-- Server-side password hashing, role checks, rate-limited sign-in/register routes, and HTTP-only session cookies.
-- MongoDB persistence for hotel/destination admin edits, enquiries, booking requests, quotes, and payment state.
-- Admin hotel and destination management, image management, enquiry queue, quote management, and booking status controls.
-- Razorpay order creation and signature verification on the server, plus a signed webhook endpoint.
-- Public health endpoint: `GET /api/health`.
+## Admin settings
 
-Saved stays and trip-bar preferences remain local to the visitor’s browser. Hotel photographs are external URLs and retain their existing source/permission notes; obtain the rights needed for your launch.
+Open **Admin → Settings** to:
+
+- Add a Gemini, Mistral, or OpenRouter API key. Any one key enables the assistant; the configured provider is selected automatically.
+- Set the preferred provider when more than one key is saved.
+- Configure the WhatsApp support number shown on the public site.
+
+AI keys are encrypted before they are stored in MongoDB and are never sent back to the browser. Provider calls and web search may incur charges. Gemini and OpenRouter support web-grounded destination information; Mistral responses do not include live web search.
+
+## Optional Razorpay setup
+
+To enable online payments, add the following to `backend\.env`:
+
+```dotenv
+RAZORPAY_KEY_ID=your-razorpay-key-id
+RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+RAZORPAY_WEBHOOK_SECRET=your-webhook-secret
+```
+
+Use Razorpay test credentials during development. Configure the webhook URL as `https://YOUR_DOMAIN/api/webhooks/razorpay` in the Razorpay dashboard and subscribe to the payment events required by your deployment. Never put private payment credentials in frontend files.
+
+Without Razorpay credentials, visitors can still send booking requests and administrators can manage enquiries and quotes, but online payment is unavailable.
+
+## How bookings work
+
+1. Visitors can browse without an account.
+2. An account is required to send an enquiry or request a booking.
+3. A booking begins as a request. An administrator checks the dates and price with the property, then sends a quote.
+4. The visitor can pay the approved quote through Razorpay when payment is configured.
+5. The team confirms the reservation with the hotel and updates its status.
+
+The catalogue does not provide dependable live room availability or pricing. A booking request is not a confirmed reservation; availability and final terms must be verified with the property.
 
 ## Tests and production build
 
+Run backend tests from `backend`:
+
 ```powershell
-npm run test:server
+npm test
+```
+
+Build the frontend from `frontend`:
+
+```powershell
 npm run build
 ```
 
-For production, build the client with `npm run build`, run the API with `npm run server`, and serve `frontend/dist` from your web host. Configure the web host/reverse proxy so `/api` routes to the Express API on the same site origin; this is important for the HTTP-only session cookie. Set `CLIENT_ORIGIN` to the exact public frontend origin, use HTTPS, use MongoDB Atlas or another managed MongoDB service, and provide live Razorpay keys only in the backend environment.
-
-The admin UI and booking flow are ready for deployment once you provide real database/payment credentials and verify the booking, cancellation, refund, privacy, and tax policies for your business. Password reset and email notifications are not configured in this project.
+For production, set secure production environment values, use HTTPS and a managed MongoDB deployment, and configure the web server to route `/api` requests to the Express API. Review hotel information, photo permissions, privacy notices, payment settings, and business policies before launch.

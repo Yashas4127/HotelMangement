@@ -7,6 +7,9 @@ import hotelRoutes from './routes/hotels.js';
 import enquiryRoutes from './routes/enquiries.js';
 import bookingRoutes, { handleRazorpayWebhook } from './routes/bookings.js';
 import adminRoutes from './routes/admin.js';
+import assistantRoutes from './routes/assistant.js';
+import SiteSettings from './models/SiteSettings.js';
+import { resolveAiProvider } from './utils/aiSettings.js';
 import dns from 'node:dns';
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const app = express();
@@ -31,8 +34,16 @@ app.use((req, _res, next) => {
 });
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
-app.get('/api/config', (_req, res) => res.json({ razorpayKeyId: process.env.RAZORPAY_KEY_ID || '' }));
+app.get('/api/config', async (_req, res) => {
+  const settings = await SiteSettings.findOne({ key: 'site' }).lean();
+  res.json({
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID || '',
+    supportWhatsApp: settings?.supportWhatsApp || '',
+    aiAssistantAvailable: Boolean(resolveAiProvider(settings)),
+  });
+});
 app.use('/api/auth', authRoutes);
+app.use('/api/assistant', assistantRoutes);
 app.use('/api', hotelRoutes);
 app.use('/api', enquiryRoutes);
 app.use('/api/bookings', bookingRoutes);
