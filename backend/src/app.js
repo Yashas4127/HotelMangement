@@ -13,7 +13,10 @@ import { resolveAiProvider } from './utils/aiSettings.js';
 import dns from 'node:dns';
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const app = express();
-const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',').map((origin) => origin.trim());
+const allowedOrigins = [
+  'https://hotel-mangement-7l3e.vercel.app',
+  ...(process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',').map((origin) => origin.trim()),
+];
 
 app.disable('x-powered-by');
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
